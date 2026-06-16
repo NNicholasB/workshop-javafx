@@ -33,7 +33,7 @@ public class MainViewController implements Initializable {
 
     @FXML
     public void onMenuItemDepartmentAction(){
-        System.out.println("Menu Department");
+        loadView("/org/study/worksjavafx/DepartmentList.fxml");
     }
 
     @FXML
@@ -45,6 +45,7 @@ public class MainViewController implements Initializable {
     public void initialize(URL uri, ResourceBundle rb) {
 
     }
+
     private synchronized void loadView(String absolutName){
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(absolutName));
