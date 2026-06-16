@@ -15,6 +15,7 @@ import org.study.worksjavafx.util.Alerts;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 public class MainViewController implements Initializable {
 
@@ -34,12 +35,15 @@ public class MainViewController implements Initializable {
 
     @FXML
     public void onMenuItemDepartmentAction(){
-        loadView2("/org/study/worksjavafx/DepartmentList.fxml");
+        loadView("/org/study/worksjavafx/DepartmentList.fxml",(DepartmentListController controller)->{
+            controller.setDepartmentService(new DepartmentService());
+            controller.updateTableView();
+        });
     }
 
     @FXML
     public void onMenuItemAboutAction(){
-      loadView("/org/study/worksjavafx/About.fxml");
+      loadView("/org/study/worksjavafx/About.fxml",x->{});
     }
 
     @Override
@@ -47,24 +51,7 @@ public class MainViewController implements Initializable {
 
     }
 
-    private synchronized void loadView(String absolutName){
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(absolutName));
-            VBox newVbox = loader.load();
-            Scene mainScene=Main.getMainScene();
-            VBox mainVBox= (VBox) ((ScrollPane)mainScene.getRoot()).getContent();
-
-            Node mainMenu=mainVBox.getChildren().get(0);
-            mainVBox.getChildren().clear();
-            mainVBox.getChildren().add(mainMenu);
-            mainVBox.getChildren().addAll(newVbox.getChildren());
-        } catch (IOException e) {
-            Alerts.showAlert("IO Exception","Error loadView",e.getMessage(), Alert.AlertType.ERROR);
-        }
-    }
-
-
-    private synchronized void loadView2(String absolutName){
+    private synchronized <T> void loadView(String absolutName, Consumer<T> initializingAction){
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(absolutName));
             VBox newVbox = loader.load();
@@ -76,11 +63,11 @@ public class MainViewController implements Initializable {
             mainVBox.getChildren().add(mainMenu);
             mainVBox.getChildren().addAll(newVbox.getChildren());
 
-            DepartmentListController controller=loader.getController();
-            controller.setDepartmentService(new DepartmentService());
-            controller.updateTableView();
+            T controller=loader.getController();
+            initializingAction.accept(controller);
         } catch (IOException e) {
             Alerts.showAlert("IO Exception","Error loadView",e.getMessage(), Alert.AlertType.ERROR);
         }
     }
+
 }
