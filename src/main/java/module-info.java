@@ -5,4 +5,7 @@ module org.study.worksjavafx {
     exports org.study.worksjavafx;
 
     opens org.study.worksjavafx to javafx.fxml;
+    opens org.study.worksjavafx.entities to javafx.base;
+
+
 }
