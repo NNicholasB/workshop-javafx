@@ -4,7 +4,7 @@ import org.study.worksjavafx.dao.DaoFactory;
 import org.study.worksjavafx.dao.DepartmentDao;
 import org.study.worksjavafx.entities.Department;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 public class DepartmentService {
@@ -20,5 +20,9 @@ public class DepartmentService {
             dao.insert(obj);
         }
         dao.update(obj);
+    }
+
+    public void remove(Department obj){
+        dao.deleteById(obj.getId());
     }
 }
