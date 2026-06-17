@@ -1,16 +1,14 @@
 package org.study.worksjavafx.util;
 
 import javafx.scene.control.TextField;
-import javafx.scene.text.Text;
 
 public class Constraints {
-    public static void setTextFieldIntereger(Text txt){
+    public static void setTextFieldIntereger( TextField txt){
         txt.textProperty().addListener((obs,oldValue,newValue)->{
             if (newValue != null && !newValue.matches("\\d*")){
                 txt.setText(oldValue);
             }
         });
-
     }
 
     public static void setTextFieldMaxLength(TextField txt, int max){
