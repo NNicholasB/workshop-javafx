@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import org.study.worksjavafx.db.DbException;
 import org.study.worksjavafx.entities.Department;
+import org.study.worksjavafx.exceptions.ValidationException;
 import org.study.worksjavafx.listeners.DataChangeListener;
 import org.study.worksjavafx.services.DepartmentService;
 import org.study.worksjavafx.util.Alerts;
@@ -16,9 +17,7 @@ import org.study.worksjavafx.util.Constraints;
 import org.study.worksjavafx.util.Utils;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class DepartmentFormController implements Initializable {
 
@@ -60,7 +59,11 @@ public class DepartmentFormController implements Initializable {
             service.saveOrUpdate(entity);
             notifyDataChangeListener();
             Utils.currentStage(ev).close();
-        }catch (DbException e){
+        }
+        catch (ValidationException e){
+            setErrorsMessages(e.getErrors());
+        }
+        catch (DbException e){
             Alerts.showAlert("Error Saving Object",null,e.getMessage(), Alert.AlertType.ERROR);
         }
     }
@@ -73,8 +76,17 @@ public class DepartmentFormController implements Initializable {
 
     private Department getFormData() {
         Department obj=new Department();
+
+        ValidationException exception=new ValidationException("Validation Error");
+
         obj.setId(Utils.tryParseToInt(textFieldId.getText()));
+        if (textFieldName.getText() ==null || textFieldName.getText().trim().equals("")){
+            exception.addError("name","Field can't be empty");
+        }
         obj.setName(textFieldName.getText());
+        if (exception.getErrors().size()>0){
+            throw exception;
+        }
         return obj;
     }
 
@@ -107,5 +119,12 @@ public class DepartmentFormController implements Initializable {
     private void initializeNodes(){
         Constraints.setTextFieldIntereger(textFieldId);
         Constraints.setTextFieldMaxLength(textFieldName,30);
+    }
+
+    private void setErrorsMessages(Map<String,String> errors){
+        Set<String> fields=errors.keySet();
+        if (fields.contains("name")){
+            labelErrorName.setText(errors.get("name"));
+        }
     }
 }
