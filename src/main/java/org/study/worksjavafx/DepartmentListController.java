@@ -16,6 +16,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.study.worksjavafx.entities.Department;
+import org.study.worksjavafx.listeners.DataChangeListener;
 import org.study.worksjavafx.services.DepartmentService;
 import org.study.worksjavafx.util.Alerts;
 import org.study.worksjavafx.util.Utils;
@@ -25,7 +26,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class DepartmentListController implements Initializable {
+public class DepartmentListController implements Initializable, DataChangeListener {
 
     private DepartmentService service;
 
@@ -88,7 +89,9 @@ public class DepartmentListController implements Initializable {
             DepartmentFormController controller=loader.getController();
             controller.setDepartment(obj);
             controller.setService(new DepartmentService());
+            controller.subscribeDataChangeListener(this);
             controller.updateFormData();
+
             Stage dioalogStage=new Stage();
             dioalogStage.setTitle("Enter Department data");
             dioalogStage.setScene(new Scene(pane));
@@ -101,5 +104,10 @@ public class DepartmentListController implements Initializable {
             Alerts.showAlert("IO Exception","Error loadView",e.getMessage(), Alert.AlertType.ERROR);
             System.out.println(e.getMessage());
         }
+    }
+
+    @Override
+    public void onDataChanged() {
+        updateTableView();
     }
 }
