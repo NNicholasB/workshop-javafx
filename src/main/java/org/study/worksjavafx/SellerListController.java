@@ -106,28 +106,28 @@ public class SellerListController implements Initializable, DataChangeListener {
     }
 
     private void createDialogForm(Seller obj,String absoluteName,Stage parentStage){
-//        try{
-//            FXMLLoader loader=new FXMLLoader(getClass().getResource(absoluteName));
-//            Pane pane=loader.load();
-//
-//            SellerFormController controller=loader.getController();
-//            controller.setSeller(obj);
-//            controller.setService(new SellerService());
-//            controller.subscribeDataChangeListener(this);
-//            controller.updateFormData();
-//
-//            Stage dioalogStage=new Stage();
-//            dioalogStage.setTitle("Enter Seller data");
-//            dioalogStage.setScene(new Scene(pane));
-//            dioalogStage.setResizable(false);
-//            dioalogStage.initOwner(parentStage);
-//            dioalogStage.initModality(Modality.WINDOW_MODAL);
-//            dioalogStage.showAndWait();
-//
-//        }catch (IOException e){
-//            Alerts.showAlert("IO Exception","Error loadView",e.getMessage(), Alert.AlertType.ERROR);
-//            System.out.println(e.getMessage());
-//        }
+        try{
+            FXMLLoader loader=new FXMLLoader(getClass().getResource(absoluteName));
+            Pane pane=loader.load();
+
+            SellerFormController controller=loader.getController();
+            controller.setSeller(obj);
+            controller.setService(new SellerService());
+            controller.subscribeDataChangeListener(this);
+            controller.updateFormData();
+
+            Stage dioalogStage=new Stage();
+            dioalogStage.setTitle("Enter Seller data");
+            dioalogStage.setScene(new Scene(pane));
+            dioalogStage.setResizable(false);
+            dioalogStage.initOwner(parentStage);
+            dioalogStage.initModality(Modality.WINDOW_MODAL);
+            dioalogStage.showAndWait();
+
+        }catch (IOException e){
+            Alerts.showAlert("IO Exception","Error loadView",e.getMessage(), Alert.AlertType.ERROR);
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override
