@@ -1,13 +1,18 @@
 package org.study.worksjavafx;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.util.Callback;
 import org.study.worksjavafx.db.DbException;
+import org.study.worksjavafx.entities.Department;
 import org.study.worksjavafx.entities.Seller;
 import org.study.worksjavafx.exceptions.ValidationException;
 import org.study.worksjavafx.listeners.DataChangeListener;
+import org.study.worksjavafx.services.DepartmentService;
 import org.study.worksjavafx.services.SellerService;
 import org.study.worksjavafx.util.Alerts;
 import org.study.worksjavafx.util.Constraints;
@@ -17,12 +22,15 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.Callable;
 
 public class SellerFormController implements Initializable {
 
     private Seller entity;
 
     private SellerService service;
+
+    private DepartmentService departmentService;
 
     private List<DataChangeListener> dataChangeListeners=new ArrayList<>();
 
@@ -34,6 +42,10 @@ public class SellerFormController implements Initializable {
 
     @FXML
     private TextField textFieldEmail;
+
+    @FXML
+    private ComboBox<Department> comboBoxDepartment;
+
 
     @FXML
     private DatePicker datePickerBirthDate;
@@ -59,6 +71,7 @@ public class SellerFormController implements Initializable {
     @FXML
     private Button buttonCancel;
 
+    private ObservableList<Department> obsList;
 
     public void subscribeDataChangeListener(DataChangeListener listener){
         dataChangeListeners.add(listener);
@@ -90,6 +103,7 @@ public class SellerFormController implements Initializable {
             listener.onDataChanged();
         }
     }
+
 
     private Seller getFormData() {
         Seller obj=new Seller();
@@ -125,15 +139,30 @@ public class SellerFormController implements Initializable {
             datePickerBirthDate.setValue(LocalDate.ofInstant( entity.getBirthDate().toInstant(), ZoneId.systemDefault()));
 
         }
+       if (entity.getDepartment()==null){
+           comboBoxDepartment.getSelectionModel().selectFirst();
+       }
+        comboBoxDepartment.setValue(entity.getDepartment());
     }
+
+
     public void setSeller(Seller entity){
         this.entity=entity;
     }
 
-    public void setService(SellerService service) {
+    public void setServices(SellerService service,DepartmentService departmentService) {
         this.service = service;
+        this.departmentService=departmentService;
     }
 
+    public void loadAssocietedObjects(){
+        if (departmentService==null){
+            throw new IllegalStateException("DepartmentService was null");
+        }
+        List<Department> list= departmentService.findAll();
+        obsList= FXCollections.observableArrayList(list);
+        comboBoxDepartment.setItems(obsList);
+    }
 
     @Override
     public void initialize(URL uri, ResourceBundle rb) {
@@ -146,6 +175,7 @@ public class SellerFormController implements Initializable {
         Constraints.setTextFieldDouble(textFieldBaseSalary);
         Constraints.setTextFieldMaxLength(textFieldEmail,60);
         Utils.formatDatePicker(datePickerBirthDate,"dd/MM/yyyy");
+        initializeComboBoxDepartment();
     }
 
     private void setErrorsMessages(Map<String,String> errors){
@@ -154,4 +184,15 @@ public class SellerFormController implements Initializable {
             labelErrorName.setText(errors.get("name"));
         }
     }
-}
+    private void initializeComboBoxDepartment(){
+        Callback<ListView<Department>,ListCell<Department>> factory= lv->new ListCell<Department>(){
+
+            @Override
+            protected void updateItem(Department item,boolean empty){
+                super.updateItem(item,empty);
+                setText(empty?"":item.getName());
+            }
+        };
+    comboBoxDepartment.setCellFactory(factory);
+    comboBoxDepartment.setButtonCell(factory.call(null));
+    }}

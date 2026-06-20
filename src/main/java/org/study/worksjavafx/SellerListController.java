@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import org.study.worksjavafx.db.DbIntegrityException;
 import org.study.worksjavafx.entities.Seller;
 import org.study.worksjavafx.listeners.DataChangeListener;
+import org.study.worksjavafx.services.DepartmentService;
 import org.study.worksjavafx.services.SellerService;
 import org.study.worksjavafx.util.Alerts;
 import org.study.worksjavafx.util.Utils;
@@ -112,10 +113,10 @@ public class SellerListController implements Initializable, DataChangeListener {
 
             SellerFormController controller=loader.getController();
             controller.setSeller(obj);
-            controller.setService(new SellerService());
+            controller.setServices(new SellerService(),new DepartmentService());
             controller.subscribeDataChangeListener(this);
             controller.updateFormData();
-
+            controller.loadAssocietedObjects();
             Stage dioalogStage=new Stage();
             dioalogStage.setTitle("Enter Seller data");
             dioalogStage.setScene(new Scene(pane));
@@ -125,8 +126,9 @@ public class SellerListController implements Initializable, DataChangeListener {
             dioalogStage.showAndWait();
 
         }catch (IOException e){
+            e.printStackTrace();
             Alerts.showAlert("IO Exception","Error loadView",e.getMessage(), Alert.AlertType.ERROR);
-            System.out.println(e.getMessage());
+
         }
     }
 
