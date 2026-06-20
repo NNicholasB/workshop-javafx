@@ -19,6 +19,7 @@ import org.study.worksjavafx.util.Constraints;
 import org.study.worksjavafx.util.Utils;
 
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
@@ -115,6 +116,25 @@ public class SellerFormController implements Initializable {
             exception.addError("name","Field can't be empty");
         }
         obj.setName(textFieldName.getText());
+
+        if (textFieldEmail.getText() == null || textFieldEmail.getText().trim().equals("")){
+            exception.addError("email","Field can't be empty");
+        }
+        obj.setEmail(textFieldEmail.getText());
+        if (datePickerBirthDate.getValue()==null){
+            exception.addError("birthDate","Field can't be empty");
+        }else{
+            Instant instant=Instant.from(datePickerBirthDate.getValue().atStartOfDay(ZoneId.systemDefault()));
+            obj.setBirthDate(Date.from(instant));
+        }
+
+
+        if (textFieldBaseSalary == null || textFieldBaseSalary.getText().trim().equals("")){
+            exception.addError("baseSalary","Field can't be empty");
+        }
+        obj.setBaseSalary(Utils.tryParseToDouble(textFieldBaseSalary.getText()));
+
+        obj.setDepartment(comboBoxDepartment.getValue());
         if (exception.getErrors().size()>0){
             throw exception;
         }
@@ -124,25 +144,6 @@ public class SellerFormController implements Initializable {
     @FXML
     public void onBtCancelAction(ActionEvent ev){
         Utils.currentStage(ev).close();
-    }
-
-    public void updateFormData(){
-        if (entity==null){
-            throw new IllegalStateException("Entity was null");
-        }
-        textFieldId.setText(String.valueOf(entity.getId()));
-        textFieldName.setText(entity.getName());
-        textFieldEmail.setText(entity.getEmail());
-        Locale.setDefault(Locale.US);
-        textFieldBaseSalary.setText(String.format("%.2f",entity.getBaseSalary()));
-        if (entity.getBirthDate() != null){
-            datePickerBirthDate.setValue(LocalDate.ofInstant( entity.getBirthDate().toInstant(), ZoneId.systemDefault()));
-
-        }
-       if (entity.getDepartment()==null){
-           comboBoxDepartment.getSelectionModel().selectFirst();
-       }
-        comboBoxDepartment.setValue(entity.getDepartment());
     }
 
 
@@ -164,6 +165,29 @@ public class SellerFormController implements Initializable {
         comboBoxDepartment.setItems(obsList);
     }
 
+
+
+    public void updateFormData(){
+        if (entity==null){
+            throw new IllegalStateException("Entity was null");
+        }
+        textFieldId.setText(String.valueOf(entity.getId()));
+        textFieldName.setText(entity.getName());
+        textFieldEmail.setText(entity.getEmail());
+        Locale.setDefault(Locale.US);
+        textFieldBaseSalary.setText(String.format("%.2f",entity.getBaseSalary()));
+        if (entity.getBirthDate() != null){
+            datePickerBirthDate.setValue(LocalDate.ofInstant( entity.getBirthDate().toInstant(), ZoneId.systemDefault()));
+
+        }
+        if (entity.getDepartment()==null){
+            comboBoxDepartment.getSelectionModel().selectFirst();
+        }else{
+            comboBoxDepartment.setValue(entity.getDepartment());
+        }
+
+    }
+
     @Override
     public void initialize(URL uri, ResourceBundle rb) {
         initializeNodes();
@@ -180,9 +204,15 @@ public class SellerFormController implements Initializable {
 
     private void setErrorsMessages(Map<String,String> errors){
         Set<String> fields=errors.keySet();
-        if (fields.contains("name")){
-            labelErrorName.setText(errors.get("name"));
-        }
+
+        labelErrorName.setText((fields.contains("name")? errors.get("name"):""));
+
+        labelErrorEmail.setText((fields.contains("email")? errors.get("email"):""));
+
+        labelErrorBirthDate.setText((fields.contains("birthDate")? errors.get("birthDate"):""));
+
+        labelErrorBaseSalary.setText((fields.contains("baseSalary")? errors.get("baseSalary"):""));
+
     }
     private void initializeComboBoxDepartment(){
         Callback<ListView<Department>,ListCell<Department>> factory= lv->new ListCell<Department>(){
